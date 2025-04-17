@@ -5,11 +5,11 @@ class LogForm(forms.ModelForm):
     class Meta:
         model = Log
         fields = [
-            'name','usage_date','usage_time',
-            'usage_place','frequency','last_used_date',
+            'usage_date','usage_time',
+            'frequency','last_used_date',
             'importance','recovery_difficulty',
             'size','weight','visibility','forget_count',
-            'time_prone','emotion_state','reminder_set',
+            'time_prone','emotion_state',
         ]
         widgets = {
             'usage_date': forms.DateInput(attrs={'type': 'date'}),

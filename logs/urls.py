@@ -4,6 +4,7 @@ from logs import views
 from logs import forms
 
 urlpatterns = [
+  path('', views.top, name='top'),
   path('index/', views.index, name='index'),
   path('log/', views.log, name='log'),
   path('log_form/', views.log_form, name='log_form'),

@@ -7,6 +7,9 @@ from .forms import LogForm
 # Create your views here.
 # This is a controller in Rails
 
+def top(request):
+  return render(request, 'logs/top.html')
+
 def index(request):
     name = "John Doe" # ローカル変数
     return render(request, 'logs/index.html', {
@@ -49,10 +52,9 @@ def log_list(request):
   logs = Log.objects.all()
   return render(request, 'logs/log_list.html', {'logs': logs})
   
-# def analysis(request):
-#   logs = Log.objects.all()
-#   context = {
-#     'logs': logs
-#   }
-#   return render(request, 'logs/analysis/proposal.html', context)
-  
+def trained(request):
+  logs = Log.objects.all()
+  context = {
+    'logs': logs
+  }
+  return render(request, 'trained.html', context)

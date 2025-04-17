@@ -1,0 +1,3 @@
+id,usage_date,usage_time,frequency,last_used_date,importance,recovery_difficulty,size,weight,visibility,forget_count,time_prone,emotion_state
+1,2025-04-08,14:21:00,weekly,2025-03-31,2,medium,small,normal,True,1,morning,late
+2,2025-04-08,14:21:00,weekly,2025-03-31,2,medium,small,normal,True,1,morning,late
