@@ -1,4 +1,11 @@
 <!DOCTYPE html>
 <h1>index</h1>
-{{name}}
 <a href="{% url 'log_form' %}">TO LogFrom</a>
+
+<table class="table">
+  <th>
+    {% for f in df %}
+    <th>{{ f }}</th>
+    {%  endfor  %}
+  </th>
+</table>

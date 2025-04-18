@@ -1,3 +1,8 @@
-id,usage_date,usage_time,frequency,last_used_date,importance,recovery_difficulty,size,weight,visibility,forget_count,time_prone,emotion_state
-1,2025-04-08,14:21:00,weekly,2025-03-31,2,medium,small,normal,True,1,morning,late
-2,2025-04-08,14:21:00,weekly,2025-03-31,2,medium,small,normal,True,1,morning,late
+id,forgotten,forgotten_item_place,frequency,importance,recovery_difficulty,size,weight,visibility,forget_count,time_prone,emotion_state
+1,True,,daily,1,easy,medium,light,False,1,morning,late
+2,True,,daily,1,easy,medium,light,False,1,morning,late
+3,True,,daily,1,easy,medium,light,False,1,morning,late
+4,True,,daily,1,easy,medium,light,False,1,morning,late
+5,,,weekly,2,easy,small,light,True,0,morning,late
+6,,,weekly,2,easy,small,light,True,0,morning,late
+7,,,weekly,2,easy,small,light,True,0,morning,late

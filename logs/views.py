@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from .models import Log
 from .forms import LogForm
+import pandas as pd
+
 
 
 # Create your views here.
@@ -11,21 +13,18 @@ def top(request):
   return render(request, 'logs/top.html')
 
 def index(request):
-    name = "John Doe" # ローカル変数
-    return render(request, 'logs/index.html', {
-        'name': name, # ローカル変数をテンプレートに渡す。
+    logs = Log.objects.all()
+    df = pd.DataFrame(logs)
+    return render(request, 'logs/index.html', { #ローカル変数をテンプレートに渡す。
+        'df': df
     })
 
 # logは、回答を受信し、送信する関数
 def log(request):
     if request.method == 'POST':
         log = Log() # 入力用のインスタンス
-        log.name = request.POST.get('name')
-        log.usage_date = request.POST.get('usage_date')
-        log.usage_time = request.POST.get('usage_time')
-        log.usage_place = request.POST.get('usage_place')
+        log.forgotten_item_place = request.POST.get('forgotten_item_place') == 'True'
         log.frequency = request.POST.get('frequency')
-        log.last_used_date = request.POST.get('last_used_date')
         log.importance = request.POST.get('importance')
         log.recovery_difficulty = request.POST.get('recovery_difficulty')
         log.size = request.POST.get('size')
@@ -43,7 +42,7 @@ def log_form(request):
     form = LogForm(request.POST)
     if form.is_valid():
       form.save()
-      return HttpResponse("ログが保存されました。")
+      return render(request, 'logs/index.html')
   else:
     form = LogForm()
   return render(request, 'logs/log_form.html', {'form': form})

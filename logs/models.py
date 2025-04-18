@@ -14,11 +14,11 @@ class Log(models.Model):
     ]
 
     SIZE_CHOICES = [
-        ('small', '小'),('medium', '中'),('large', '大')
+        ('small', '小'),('large', '大')
     ]
 
     WEIGHT_CHOICES = [
-        ('light', '軽い'),('normal', '普通'),('heavy', '重い')
+        ('light', '軽い'),('heavy', '重い')
     ]
 
     VISIBILITY_CHOICES = [
@@ -33,25 +33,21 @@ class Log(models.Model):
         ('busy', '慌ただしい'),('late', '寝坊した'),('calm', '落ち着いている')
     ]
 
+    forgotten_item_place = models.BooleanField(null=True) 
 
-    usage_date = models.DateField()          
-    usage_time = models.TimeField()         
+    frequency = models.CharField(null=True,max_length=20, choices=FREQUENCY_CHOICES)
 
-
-    frequency = models.CharField(max_length=20, choices=FREQUENCY_CHOICES)
-    last_used_date = models.DateField(null=True, blank=True) 
-
-    importance = models.IntegerField(choices=IMPORTANCE_CHOICES)  
-    recovery_difficulty = models.CharField(max_length=50, choices=RECOVERY_DIFFICULTY_CHOICES) 
+    importance = models.IntegerField(null=True,choices=IMPORTANCE_CHOICES)
+    recovery_difficulty = models.CharField(max_length=50, choices=RECOVERY_DIFFICULTY_CHOICES)
     
 
 
-    size = models.CharField(max_length=10, choices=SIZE_CHOICES)  
-    weight = models.CharField(max_length=10, choices=WEIGHT_CHOICES) 
-    visibility = models.BooleanField(choices=VISIBILITY_CHOICES, default=True)  
+    size = models.CharField(max_length=10, choices=SIZE_CHOICES)
+    weight = models.CharField(max_length=10, choices=WEIGHT_CHOICES)
+    visibility = models.BooleanField(choices=VISIBILITY_CHOICES, default=True)
     
-    forget_count = models.IntegerField(default=0) 
-    time_prone = models.CharField(max_length=10, choices=TIME_PRONE_CHOICES, blank=True)  
-    emotion_state = models.CharField(max_length=30, choices=EMOTION_STATE_CHOICES, blank=True)  
+    forget_count = models.IntegerField(null=True,default=0) 
+    time_prone = models.CharField(max_length=10,null=True, choices=TIME_PRONE_CHOICES, blank=True)  
+    emotion_state = models.CharField(max_length=30,null=True, choices=EMOTION_STATE_CHOICES, blank=True)  
 
 
