@@ -1,6 +1,25 @@
 <!DOCTYPE html>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">送信</button>
-</form>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>あなたのサイト名</title>
+<!-- Bootstrap CSS -->
+<link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap JS (必要ならば) -->
+<script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+
+  {% block content %}
+  <div class="container text-center">
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">送信</button>
+      </form>
+  </div>
+  {% endblock %}
+
+</body>
+</html>

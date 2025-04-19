@@ -15,6 +15,27 @@ def export_log_to_csv(sender, instance, **kwargs):
   logs = Log.objects.all()
   with open(filepath, 'w', newline='') as f:
     writer = csv.writer(f)
-    writer.writerow(['id', 'forgotten_item_place',  'frequency',  'importance', 'recovery_difficulty', 'size', 'weight', 'visibility', 'forget_count', 'time_prone', 'emotion_state'])
+    writer.writerow([
+    'id',
+    'new_item_today',
+    'schedule_changed_today',
+    'emotion_state_today',
+    'routine_destination_tomorrow',
+    'special_event_tomorrow',
+    'extra_items_needed_tomorrow',
+    'time_difference_tomorrow',
+    'will_forget'
+])
+
     for log in logs:
-      writer.writerow([log.id,log.forgotten_item_place,    log.frequency,  log.importance, log.recovery_difficulty, log.size, log.weight, log.visibility, log.forget_count, log.time_prone, log.emotion_state])
+        writer.writerow([
+        log.id,
+        log.new_item_today,
+        log.schedule_changed_today,
+        log.emotion_state_today,
+        log.routine_destination_tomorrow,
+        log.special_event_tomorrow,
+        log.extra_items_needed_tomorrow,
+        log.time_difference_tomorrow,
+        log.will_forget
+    ])

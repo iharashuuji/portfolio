@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <h1>index</h1>
-<a href="{% url 'log_form' %}">TO LogFrom</a>
+<a href="{% url 'logs:log_form' %}">TO LogFrom</a>
 
 <table class="table">
   <th>
-    {% for f in df %}
-    <th>{{ f }}</th>
-    {%  endfor  %}
+  {% if prediction is not None %}
+    <h2>予測結果: {{ prediction }}</h2>
+  {% else %}
+    <p>予測結果はまだありません。</p>
+  {% endif %}
   </th>
 </table>

@@ -5,10 +5,14 @@ class LogForm(forms.ModelForm):
     class Meta:
         model = Log
         fields = [
-            'forgotten_item_place',
-            'importance','recovery_difficulty','frequency',
-            'size','weight','visibility','forget_count',
-            'time_prone','emotion_state',
+            'new_item_today',
+            'schedule_changed_today',
+            'emotion_state_today',
+            'routine_destination_tomorrow',
+            'special_event_tomorrow',
+            'extra_items_needed_tomorrow',
+            'time_difference_tomorrow',
         ]
+
 
 
