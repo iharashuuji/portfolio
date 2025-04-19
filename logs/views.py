@@ -41,6 +41,9 @@ def log(request):
         log.extra_items_needed_tomorrow = request.POST.get('明日は追加の持ち物があるか') == 'True'
         log.time_difference_tomorrow = request.POST.get('明日はいつもと違う時間に出発するか') == 'True'
         log.save()
+        if log.will_forget is None:
+            return redirect('logs:confirm_label', log_id=log.id)
+        
         return render(request, 'logs/log_form.html', {'log': log})
     return render(request, 'logs/index.html')
   
@@ -81,3 +84,15 @@ def log_form(request):
         form = LogForm()
         print("GETリクエスト：フォームを表示")
     return render(request, 'logs/log_form.html', {'form': form})
+
+
+
+def confirm_label(request, log_id):
+    log = Log.objects.get(id=log_id)
+    if request.method == 'POST':
+        log.will_forget = request.POST.get('忘れ物をしたか？') == 'True'
+        log.save()
+        return redirect('logs:index')
+    return render(request, 'logs/confirm_label.html', {'log': log})
+  
+  

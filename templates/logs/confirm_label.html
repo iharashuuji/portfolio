@@ -1,0 +1,9 @@
+<h1>昨日忘れものはしましたか？</h1>
+<form method="post" action="{% url 'logs:confirm' %}">
+  {% csrf_token %}
+  <label for="yesterday">昨日忘れものはしましたか？</label>
+  <input type="radio" id="yes" name="yesterday" value=True>
+  <label for="yes">はい</label>
+  <input type="radio" id="no" name="yesterday" value=False>
+  <label for="no">いいえ</label>
+  <button type="submit">送信</button>
