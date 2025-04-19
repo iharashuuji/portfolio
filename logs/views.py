@@ -21,10 +21,12 @@ def top(request):
 
 def index(request): 
     logs = Log.objects.all()
-    prediction = request.session.get('prediction', None)
-    return render(request, 'logs/index.html', { #ローカル変数をテンプレートに渡す。
+    last_log = logs.last() 
+    prediction = request.session.pop('prediction', None)
+    return render(request, 'logs/index.html',{
         'logs': logs,
         'prediction': prediction,
+        'last_log':last_log,
     })
 
 # logは、回答を受信し、送信する関数
@@ -50,27 +52,50 @@ def log(request):
 
 def log_form(request):
     if request.method == 'POST':
+        print(request.POST)
         form = LogForm(request.POST)
         if form.is_valid():
-            form.save()
+            data = form.cleaned_data
 
-            # 🔽 予測用の特徴量を取得
+            emotion_onehot = [
+        1 if data['emotion_state_today'] == 'busy' else 0,
+        1 if data['emotion_state_today'] == 'calm' else 0,
+        1 if data['emotion_state_today'] == 'late' else 0,
+        ]
+
             features = [
-                int(request.POST.get('time_difference_tomorrow', 'False') == 'True'),
-                int(request.POST.get('extra_items_needed_tomorrow', 'False') == 'True'),
-                int(request.POST.get('routine_destination_tomorrow', 'False') == 'True'),
-                int(request.POST.get('new_item_today', 'False') == 'True'),
-                int(request.POST.get('schedule_changed_today', 'False') == 'True'),
-                int(request.POST.get('emotion_state_today_busy', 'False') == 'True'),
-                int(request.POST.get('emotion_state_today_calm', 'False') == 'True'),
-                int(request.POST.get('emotion_state_today_late', 'False') == 'True'),
-                int(request.POST.get('special_event_tomorrow', 'False') == 'True'),
+        int(data['time_difference_tomorrow']),
+        int(data['extra_items_needed_tomorrow']),
+        int(data['routine_destination_tomorrow']),
+        int(data['new_item_today']),
+        int(data['schedule_changed_today']),
+        *emotion_onehot,
+        int(data['special_event_tomorrow']),
             ]
+
+            print("予測用特徴量:", features)
+            
+            feature_names = [
+            'time_difference_tomorrow',
+            'extra_items_needed_tomorrow',
+            'routine_destination_tomorrow',
+            'new_item_today',
+            'schedule_changed_today',
+            'emotion_state_today_busy',
+            'emotion_state_today_calm',
+            'emotion_state_today_late',
+            'special_event_tomorrow'
+            ]
+
+            df = pd.DataFrame([features], columns=feature_names)
+
+
+
 
             # 🔽 モデル読み込みと予測
             model_path = os.path.join(settings.BASE_DIR, 'model.pkl')
             model = joblib.load(model_path)
-            prediction = model.predict([features])[0]
+            prediction = model.predict_proba([features])[0][1]
 
             # 🔽 予測値をセッションに保存
             request.session['prediction'] = str(prediction)

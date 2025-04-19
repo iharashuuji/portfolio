@@ -23,19 +23,7 @@ df = pd.DataFrame(logs)
 # 機械学習データの用意
 df_copy = pd.get_dummies(df.copy(), columns=['emotion_state_today'])
 
-df_corr = df_copy.corr()
-top_corr = df_corr.unstack().abs().sort_values(ascending=False)
-top_corr = top_corr[top_corr < 1.0]
 
-missing_pattern_counts = df_copy[[
-    'new_item_today',
-    'schedule_changed_today',
-    'routine_destination_tomorrow',
-    'special_event_tomorrow'
-]].isnull().astype(int).value_counts()
-
-print(missing_pattern_counts)
-print('----------------------')
 
 df_copy = df_copy.fillna(False)
 
@@ -62,8 +50,7 @@ rf = RandomForestClassifier(
 # モデルの学習
 rf.fit(X_train, y_train)
 
-# 予測
-y_pred = rf.predict(X_test)
+# y_pred = rf.predict(X_test)
 # f1_score_value = f1_score(y_test, y_pred)
 # roc_auc_score_value = roc_auc_score(y_test, y_pred)
 
@@ -84,4 +71,3 @@ joblib.dump(rf, 'model.pkl')
 
 # 137 is the number of 1, 163 is the number of 0 →不均衡データでもない
 # 欠損数を確認 →無し
-

@@ -1,25 +1,33 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>あなたのサイト名</title>
-<!-- Bootstrap CSS -->
-<link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<!-- Bootstrap JS (必要ならば) -->
-<script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-</head>
 <body>
-
-  {% block content %}
   <div class="container text-center">
-      <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">送信</button>
-      </form>
-  </div>
-  {% endblock %}
+    <form method="post">
+      {% csrf_token %}
 
+      <label>今日新しい持ち物が追加された</label>
+      {{ form.new_item_today }}<br>
+
+      <label>今日予定が変更された</label>
+      {{ form.schedule_changed_today }}<br>
+
+      <label>今日の感情の状態</label>
+      {{ form.emotion_state_today }}<br>
+
+      <label>明日いつもの場所に行く</label>
+      {{ form.routine_destination_tomorrow }}<br>
+
+      <label>明日は特別なイベントがある</label>
+      {{ form.special_event_tomorrow }}<br>
+
+      <label>明日持っていく必要がある追加のアイテムがある</label>
+      {{ form.extra_items_needed_tomorrow }}<br>
+
+      <label>明日は時差がある（旅行など）</label>
+      {{ form.time_difference_tomorrow }}<br>
+
+      <button type="submit">送信</button>
+    </form>
+  </div>
 </body>
 </html>

@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <h1>index</h1>
-<a href="{% url 'logs:log_form' %}">TO LogFrom</a>
+{% if last_log.will_forget is None %}
+    <a href="{% url 'logs:confirm_label' log_id=last_log.id %}">TO LogForm</a>
+{% else %}
+    <a href="{% url 'logs:log_form' %}">TO LogForm</a>
+{% endif %}
 
 <table class="table">
   <th>
