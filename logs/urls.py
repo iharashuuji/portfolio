@@ -11,3 +11,5 @@ urlpatterns = [
   path('log/', views.log, name='log'),
   path('log_form/', views.log_form, name='log_form'),
 ]
+
+
