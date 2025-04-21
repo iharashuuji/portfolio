@@ -1,8 +1,11 @@
 from django.db import models
+import datetime
 
 class Log(models.Model):
     # 前日の状態
     # 新しいものを今日持っているか？
+    date = models.DateField(unique=True, default=datetime.date.today)
+
     new_item_today = models.BooleanField()  # 新しい物を持っていったか
     # 今日は突然のスケジュールが会ったか？
     schedule_changed_today = models.BooleanField()  # スケジュールに変更があったか
@@ -16,7 +19,6 @@ class Log(models.Model):
         ],
 
     )
-
     # 翌日の予定
     # 明日はいつもの場所に行くか
     routine_destination_tomorrow = models.BooleanField()  # いつも通りの場所か
@@ -28,4 +30,4 @@ class Log(models.Model):
     time_difference_tomorrow = models.BooleanField()  # 通常と異なる時間帯か
 
     # 目的変数
-    will_forget = models.BooleanField()  # 翌日に忘れ物をするか
+    will_forget = models.BooleanField(null=True, blank=True, default=None)  # 翌日に忘れ物をするか

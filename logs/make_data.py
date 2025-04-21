@@ -4,6 +4,8 @@ import random
 import numpy as np
 import pandas as pd
 import sys
+from datetime import datetime, timedelta
+
 
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -19,6 +21,7 @@ from logs.models import Log
 
 importance_values = np.random.normal(loc=3, scale=1, size=300)
 import_values = np.clip(np.round(importance_values), 1, 5).astype(int)
+start_date = datetime(2020, 1, 1)
 
 logs = []
 for i in range(300):
@@ -68,6 +71,7 @@ for i in range(300):
     will_forget = 1 if random.random() < forget_probability else 0  # 忘れ物をするか？
 
     log = Log(
+        date=start_date + timedelta(days=i),
         new_item_today=new_item_today,  # 新しい物を持っていったか
         schedule_changed_today=schedule_changed_today,  # スケジュールに変更があったか
         emotion_state_today=emotion_state_today,  # 今日の感情状態

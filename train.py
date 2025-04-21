@@ -22,6 +22,7 @@ df = pd.DataFrame(logs)
 # データクレンジング
 # 機械学習データの用意
 df_copy = pd.get_dummies(df.copy(), columns=['emotion_state_today'])
+df_copy = df_copy.drop(columns=['date'])
 
 
 

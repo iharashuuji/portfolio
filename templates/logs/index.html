@@ -1,24 +1,26 @@
 <!DOCTYPE html>
 <h1>index</h1>
+{% comment %} 一番最初に入力するべき項目が入力が行われているか？ {% endcomment %}
+
 {% comment %} ２回目の入力に忘れ物をしたかを聞く機能 {% endcomment %}
-{% if last_log.will_forget is None %}
-    <a href="{% url 'logs:confirm_label' log_id=last_log.id %}">TO LogForm</a>
+{% if last_log and last_log.will_forget == None %}
+  <a href="{% url 'logs:log_form_edit' last_log.id%}">TO LogForm</a>
 {% else %}
-    <a href="{% url 'logs:log_form' %}">TO LogForm</a>
+  <a href="{% url 'logs:log_form' %}">TO LogForm</a>
 {% endif %}
+<p>will_forget: {{ last_log.will_forget }}</p>
+
+
 
 {% comment %} 忘れ物をする確率を５０％を超えた際に、持っていくべきものをTo Doまで自動で落とし込む {% endcomment %}
 {% if prediction and prediction > 0.5 %}
-  <form action="{% url 'suggestions:write_memo' %}" method="post">
+  <form action="{% url 'suggestions:list_form' %}" method="post">
     {% csrf_token %}
-    <label>明日忘れたくないもの:</label><br>
-    <textarea name="memo" rows="3" cols="40"></textarea><br>
-    <button type="submit">メモを保存</button>
+    <button type="submit">明日持つべきものをCHECK!</button>
   </form>
 {% endif %}
 
 {% comment %} 予測結果を表示する {% endcomment %}
-
 <table class="table">
   <th>
   {% if prediction is not None %}

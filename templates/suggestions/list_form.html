@@ -1,0 +1,16 @@
+<h1>ListForm</h1>
+<html lang="ja">
+  <body>
+    <div>
+      <form method="post">
+        {% csrf_token %}
+        <label>明日持っていく必要があるもの</label><br>
+        {{ form.must_item_1 }}<br>
+        <button type="submit">入力内容を確認</button>
+      </form>
+    </div>
+  </body>
+  <a href="{% url 'logs:index' %}">index</a>
+</html>
+
+

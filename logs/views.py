@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from .models import Log
 from .forms import LogForm
+from .forms import LogDateForm
 import pandas as pd
 import os
 from django.conf import settings
@@ -9,6 +10,10 @@ import joblib
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect
+from datetime import date
+from django.shortcuts import get_object_or_404
+
+
 
 
 
@@ -17,12 +22,34 @@ from django.shortcuts import redirect
 # This is a controller in Rails
 
 def top(request):
-  return render(request, 'logs/top.html')
+    if request.method == 'POST':
+        form = LogDateForm(request.POST)
+        if form.is_valid():
+            selected_date = form.cleaned_data['date']
+
+            # その日付のログがすでにあるかチェック
+            log = Log.objects.filter(user=request.user, date=selected_date).first()
+
+            if log:
+                # ログがすでに存在する場合、そのログフォームに遷移
+                return redirect('logs:log_form_edit', log_id=log.id)
+            else:
+                # ログがない場合、新規作成フォームに遷移
+                return redirect('logs:log_form_create', date=selected_date)
+    else:
+        form = LogDateForm()
+
+    return render(request, 'logs/top.html', {'form': form, 'date':date})
 
 def index(request): 
     logs = Log.objects.all()
-    last_log = logs.last() 
+    last_log = logs.last()
     prediction = request.session.pop('prediction', None)
+        # 安全に float 変換（None 対応込み）
+    try:
+        prediction = float(prediction) if prediction is not None else None
+    except ValueError:
+        prediction = None
     return render(request, 'logs/index.html',{
         'logs': logs,
         'prediction': prediction,
@@ -43,81 +70,76 @@ def log(request):
         log.extra_items_needed_tomorrow = request.POST.get('明日は追加の持ち物があるか') == 'True'
         log.time_difference_tomorrow = request.POST.get('明日はいつもと違う時間に出発するか') == 'True'
         log.save()
-        if log.will_forget is None:
-            return redirect('logs:confirm_label', log_id=log.id)
-        
-        return render(request, 'logs/log_form.html', {'log': log})
+        return render(request, 'logs/log_form_create.html', {'log': log})
     return render(request, 'logs/index.html')
   
 
-def log_form(request):
+def log_form(request, log_id=None):
+  # これ何を行っている？→Log＿Idが指定されていたらLogオブジェクトを取得を行う。新規作成モードか編集モードかを分けるコード
+    if log_id:
+      return redirect('logs:log_form_edit', log_id=log_id)  # 編集用ビューにリダイレクト
+    log = None
+
     if request.method == 'POST':
-        print(request.POST)
-        form = LogForm(request.POST)
+        form = LogForm(request.POST, instance=log)
         if form.is_valid():
             data = form.cleaned_data
 
+            if log is None:
+                log = form.save(commit=False)  # 最初のPOST
+            #     log.save()
+            #     return redirect('logs:log_form', log_id=log.id)
+
+            # 2回目POST：will_forget 以外の項目入力
             emotion_onehot = [
-        1 if data['emotion_state_today'] == 'busy' else 0,
-        1 if data['emotion_state_today'] == 'calm' else 0,
-        1 if data['emotion_state_today'] == 'late' else 0,
-        ]
-
+                1 if data['emotion_state_today'] == 'busy' else 0,
+                1 if data['emotion_state_today'] == 'calm' else 0,
+                1 if data['emotion_state_today'] == 'late' else 0,
+            ]
             features = [
-        int(data['time_difference_tomorrow']),
-        int(data['extra_items_needed_tomorrow']),
-        int(data['routine_destination_tomorrow']),
-        int(data['new_item_today']),
-        int(data['schedule_changed_today']),
-        *emotion_onehot,
-        int(data['special_event_tomorrow']),
+                int(data['time_difference_tomorrow']),
+                int(data['extra_items_needed_tomorrow']),
+                int(data['routine_destination_tomorrow']),
+                int(data['new_item_today']),
+                int(data['schedule_changed_today']),
+                *emotion_onehot,
+                int(data['special_event_tomorrow']),
             ]
-
-            print("予測用特徴量:", features)
-            
-            feature_names = [
-            'time_difference_tomorrow',
-            'extra_items_needed_tomorrow',
-            'routine_destination_tomorrow',
-            'new_item_today',
-            'schedule_changed_today',
-            'emotion_state_today_busy',
-            'emotion_state_today_calm',
-            'emotion_state_today_late',
-            'special_event_tomorrow'
-            ]
-
-            df = pd.DataFrame([features], columns=feature_names)
-
-
-
-
-            # 🔽 モデル読み込みと予測
             model_path = os.path.join(settings.BASE_DIR, 'model.pkl')
             model = joblib.load(model_path)
             prediction = model.predict_proba([features])[0][1]
-
-            # 🔽 予測値をセッションに保存
             request.session['prediction'] = str(prediction)
-
-            # 予測結果をJSONで返す（文字列に変換している）
-            return redirect('logs:index')  # 予測結果を文字列に変換
-        else:
-            print("保存に失敗")
-            print(form.errors)
+            log.will_forget = None
+            form.save()
+            return redirect('logs:index')
     else:
-        form = LogForm()
-        print("GETリクエスト：フォームを表示")
-    return render(request, 'logs/log_form.html', {'form': form})
+        form = LogForm(instance=log)
 
+    return render(request, 'logs/log_form.html', {'form': form, 'log': log})
 
+ 
+ # 既存のFORMの編集用
+def log_form_edit(request, log_id):
+  # 既存のものを見つける。
+  log = get_object_or_404(Log, id=log_id)
+  if request.method == 'POST':
+    form = LogForm(request.POST, instance=log)
+    if form.is_valid():
+      form.save()
+      return redirect('logs:index')
+  else:
+    form = LogForm(instance=log) 
+  return render(request, 'logs/log_form_edit.html', {'log':log, 'form': form})
 
 def confirm_label(request, log_id):
     log = Log.objects.get(id=log_id)
-    if request.method == 'POST':
-        log.will_forget = request.POST.get('忘れ物をしたか？') == 'True'
-        log.save()
-        return redirect('logs:index')
-    return render(request, 'logs/confirm_label.html', {'log': log})
-  
-  
+    prediction = request.session.pop('prediction', None)
+    # 安全に float 変換（None 対応込み）
+    try:
+        prediction = float(prediction) if prediction is not None else None
+    except ValueError:
+        prediction = None
+    return render(request, 'logs/index.html', {
+        'log': log,
+        'prediction': prediction,
+    })
