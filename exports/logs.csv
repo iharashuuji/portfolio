@@ -299,4 +299,4 @@ id,new_item_today,schedule_changed_today,emotion_state_today,routine_destination
 298,True,True,busy,True,True,True,True,True
 299,False,True,late,True,False,False,True,True
 300,False,False,late,False,False,True,True,True
-301,False,False,,False,False,False,False,True
+301,False,False,busy,False,True,True,True,

@@ -11,6 +11,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect
 from datetime import date
+from django.utils.timezone import now
 from django.shortcuts import get_object_or_404
 
 
@@ -42,6 +43,8 @@ def top(request):
     return render(request, 'logs/top.html', {'form': form, 'date':date})
 
 def index(request): 
+    today_log = Log.objects.get_or_create(date=now().date())[0]
+    suggestions = today_log.suggestions.all()
     logs = Log.objects.all()
     last_log = logs.last()
     prediction = request.session.pop('prediction', None)
@@ -54,6 +57,7 @@ def index(request):
         'logs': logs,
         'prediction': prediction,
         'last_log':last_log,
+        'suggestions': suggestions,
     })
 
 # logは、回答を受信し、送信する関数
@@ -73,29 +77,34 @@ def log(request):
         return render(request, 'logs/log_form_create.html', {'log': log})
     return render(request, 'logs/index.html')
   
+from django.utils.timezone import now
 
 def log_form(request, log_id=None):
-  # これ何を行っている？→Log＿Idが指定されていたらLogオブジェクトを取得を行う。新規作成モードか編集モードかを分けるコード
     if log_id:
-      return redirect('logs:log_form_edit', log_id=log_id)  # 編集用ビューにリダイレクト
+        return redirect('logs:log_form_edit', log_id=log_id)
+
     log = None
 
     if request.method == 'POST':
+        # 今日の日付に対応する Log があるか確認（なければ作る）
+        log, created = Log.objects.get_or_create(date=now().date())
+
         form = LogForm(request.POST, instance=log)
+
         if form.is_valid():
             data = form.cleaned_data
 
-            if log is None:
-                log = form.save(commit=False)  # 最初のPOST
-            #     log.save()
-            #     return redirect('logs:log_form', log_id=log.id)
+            # will_forget は後で追加するので一旦 None
+            log.will_forget = None
 
-            # 2回目POST：will_forget 以外の項目入力
+            # 感情のワンホットエンコード
             emotion_onehot = [
                 1 if data['emotion_state_today'] == 'busy' else 0,
                 1 if data['emotion_state_today'] == 'calm' else 0,
                 1 if data['emotion_state_today'] == 'late' else 0,
             ]
+
+            # モデル予測用特徴量
             features = [
                 int(data['time_difference_tomorrow']),
                 int(data['extra_items_needed_tomorrow']),
@@ -105,14 +114,18 @@ def log_form(request, log_id=None):
                 *emotion_onehot,
                 int(data['special_event_tomorrow']),
             ]
+
             model_path = os.path.join(settings.BASE_DIR, 'model.pkl')
             model = joblib.load(model_path)
             prediction = model.predict_proba([features])[0][1]
             request.session['prediction'] = str(prediction)
-            log.will_forget = None
-            form.save()
+
+            # 保存
+            log.save()
             return redirect('logs:index')
     else:
+        # GET のときも今日の Log を使う
+        log, _ = Log.objects.get_or_create(date=now().date())
         form = LogForm(instance=log)
 
     return render(request, 'logs/log_form.html', {'form': form, 'log': log})

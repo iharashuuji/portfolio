@@ -3,7 +3,7 @@ from .models import List
 from .forms import ListForm
 from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404
-
+from django.utils.timezone import now
 
 # Create your views here.
 
