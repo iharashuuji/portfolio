@@ -1,58 +1,57 @@
-<!DOCTYPE html>
-<div class="container">
-  <div class="row">
-    
-  </div>
-</div>
-<h1>index</h1>
-{% comment %} 一番最初に入力するべき項目が入力が行われているか？ {% endcomment %}
+<main>
+    <section class="confirm_will_forget">
+      {% comment %} ２回目の入力に忘れ物をしたかを聞く機能 {% endcomment %}
+      {% if last_log and last_log.will_forget == None %}
+      <a href="{% url 'logs:log_form_edit' last_log.id%}">TO LogForm</a>
+      {% else %}
+      <a href="{% url 'logs:log_form' %}">TO LogForm</a>
+      {% endif %}
+      <p>will_forget: {{ last_log.will_forget }}</p>
+    </section>
+    <section class="Note_forget_item">
+      {% comment %} 忘れ物をする確率を５０％を超えた際に、持っていくべきものをTo Doまで自動で落とし込む {% endcomment %}
+      {% if prediction and prediction > 0.5 %}
+      <form action="{% url 'suggestions:list_form' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">明日持つべきものをCHECK!</button>
+      </form>
+      {% endif %}
+    </section>
+    {% comment %} 予測結果の表示を行う {% endcomment %}
+    <section class="show_prediction">
+      <table class="table">
+        <th>
+        {% if prediction is not None %}
+          <h2>予測結果: {{ prediction }}</h2>
+        {% else %}
+          <p>予測結果はまだありません。</p>
+        {% endif %}
+        </th>
+      </table>
+    </section>
+    <section class="to_do_list">
+      <h1>今日のやるべきこと</h1>
 
-{% comment %} ２回目の入力に忘れ物をしたかを聞く機能 {% endcomment %}
-{% if last_log and last_log.will_forget == None %}
-  <a href="{% url 'logs:log_form_edit' last_log.id%}">TO LogForm</a>
-{% else %}
-  <a href="{% url 'logs:log_form' %}">TO LogForm</a>
-{% endif %}
-<p>will_forget: {{ last_log.will_forget }}</p>
-
-
-
-{% comment %} 忘れ物をする確率を５０％を超えた際に、持っていくべきものをTo Doまで自動で落とし込む {% endcomment %}
-{% if prediction and prediction > 0.5 %}
-  <form action="{% url 'suggestions:list_form' %}" method="post">
-    {% csrf_token %}
-    <button type="submit">明日持つべきものをCHECK!</button>
-  </form>
-{% endif %}
-
-{% comment %} 予測結果を表示する {% endcomment %}
-<table class="table">
-  <th>
-  {% if prediction is not None %}
-    <h2>予測結果: {{ prediction }}</h2>
-  {% else %}
-    <p>予測結果はまだありません。</p>
-  {% endif %}
-  </th>
-</table>
-
-
-<h1>今日のやるべきこと</h1>
-
-{% if suggestions %}
-    <ul>
-    {% for suggestion in suggestions %}
-        <li>
+      {% if suggestions %}
+          <ul>
+          {% for suggestion in suggestions %}
+              <li>
             {{ suggestion.must_item_1 }}<br>
             {{ suggestion.must_item_2 }}<br>
             {{ suggestion.must_item_3 }}<br>
             {{ suggestion.must_item_4 }}<br>
             {{ suggestion.must_item_5 }}<br>
             {{ suggestion.must_item_6 }}<br>
-        </li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>今日のやるべきことはありません。</p>
-{% endif %}
+              </li>
+          {% endfor %}
+          </ul>
+      {% else %}
+          <p>今日のやるべきことはありません。</p>
+      {% endif %}
+
+    </section>
+</main>
+
+
+
 

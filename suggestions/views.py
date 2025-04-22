@@ -28,6 +28,8 @@ def list_form(request):
       return redirect('suggestions:show', list_id=list.id)
     else:
       form = ListForm()
+  else:
+    form = ListForm()
   return render(request, 'suggestions/list_form.html', {'form': form})
 
 
