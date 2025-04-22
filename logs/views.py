@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect
 from datetime import date
 from django.utils.timezone import now
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 
 
@@ -42,6 +43,7 @@ def top(request):
 
     return render(request, 'logs/top.html', {'form': form, 'date':date})
 
+@login_required
 def index(request): 
     today_log = Log.objects.get_or_create(date=now().date())[0]
     suggestions = today_log.suggestions.all()
@@ -79,6 +81,7 @@ def log(request):
   
 from django.utils.timezone import now
 
+@login_required
 def log_form(request, log_id=None):
     if log_id:
         return redirect('logs:log_form_edit', log_id=log_id)
@@ -132,6 +135,7 @@ def log_form(request, log_id=None):
 
  
  # 既存のFORMの編集用
+@login_required
 def log_form_edit(request, log_id):
   # 既存のものを見つける。
   log = get_object_or_404(Log, id=log_id)

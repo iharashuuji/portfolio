@@ -1,0 +1,9 @@
+<h2>Log in</h2>
+<form method="post">
+  {%csrf_tokeb%}
+  ユーザー名：<input type="text" name="username"><br>
+  パスワード：<input type="passward" name="passward"><br>
+  <button type="submit">ログイン</button>
+</form>
+
+<a href="{% url "accounts:sign_up" }">新規登録</a>

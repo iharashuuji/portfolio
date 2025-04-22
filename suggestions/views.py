@@ -4,12 +4,15 @@ from .forms import ListForm
 from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
+from django.contrib.auth.decorators import login_required
+
 
 # Create your views here.
 
 # 必要要件：忘れ物の確率が５０％を超えた際に、
 # 忘れ物に関して記述を行っておライその記述されたものを通知で知らせるようにする。
 # なので必要なカラムに関しては、入力してもらったデータをモデルに送信を行う為のカラム
+@login_required
 def list(request):
   if request.method == 'POST':
     list = List()
@@ -17,6 +20,8 @@ def list(request):
     list.save()
     return render(request, 'suggestions/list.html') 
   
+@login_required
+
 def list_form(request):
   if request.method == 'POST':
     form = ListForm(request.POST)
@@ -32,7 +37,7 @@ def list_form(request):
     form = ListForm()
   return render(request, 'suggestions/list_form.html', {'form': form})
 
-
+@login_required
 def show(request, list_id):
   list = get_object_or_404(List, id=list_id)
   return render(request, 'suggestions/show.html', {'list': list})
