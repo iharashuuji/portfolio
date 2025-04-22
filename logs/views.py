@@ -7,6 +7,8 @@ import pandas as pd
 import os
 from django.conf import settings
 import joblib
+from datetime import timedelta
+
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect
@@ -45,14 +47,22 @@ def top(request):
 
 @login_required
 def index(request): 
-    today_log = Log.objects.get_or_create(date=now().date())[0]
-    suggestions = today_log.suggestions.all()
+    # ↓ 昨日の日付に変更（ここを修正済み）
+    yesterday = now().date() - timedelta(days=1)
+    yesterday_log = Log.objects.filter(date=yesterday).first()  # ← 存在しない可能性もあるので .first()
+
+    # ↓ 昨日のログがあれば、その suggestions を使う（ここを修正済み）
+    suggestions = yesterday_log.suggestions.all() if yesterday_log else []
     logs = Log.objects.all()
     last_log = logs.last()
     prediction = request.session.pop('prediction', None)
         # 安全に float 変換（None 対応込み）
     try:
-        prediction = float(prediction) if prediction is not None else None
+        if prediction is not None:
+            prediction = float(prediction)  # ← 修正済み：ここで str を float に変換
+            prediction = int(prediction * 100)
+        else:
+            prediction=None
     except ValueError:
         prediction = None
     return render(request, 'logs/index.html',{
