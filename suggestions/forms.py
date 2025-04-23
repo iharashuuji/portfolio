@@ -16,3 +16,7 @@ class ListForm(forms.ModelForm):
             'must_item_1': forms.TextInput(attrs={'placeholder': '忘れ物1'}),
 
         }
+        
+class TodoListCreateForm(forms.Form):
+  title = forms.CharField(label='リスト名', max_length=100)
+  tasks = forms.CharField(label='タスク（改行区切り）', widget=forms.Textarea)

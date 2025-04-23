@@ -3,9 +3,9 @@
 
 <h2>明日持っていくべきもの一覧</h2>
 <ul>
-  <li>{{ list.must_item_1 }}</li>
+  <li>{{ form.as_p }}</li>
 </ul>
-
+<button type='submit'>Add</button>
 {% comment %} 合っているかの確認を行う必要がある。 {% endcomment %}
 
 <a href="{% url 'suggestions:list_form' %}">Back</a>

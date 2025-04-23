@@ -1,17 +1,27 @@
 
-<h1>ListForm</h1>
-<html lang="ja">
-  <body>
-    <div>
-      <form method="post">
-        {% csrf_token %}
-        <label>明日持っていく必要があるもの</label><br>
-        {{ form.must_item_1 }}<br>
-        <button type="submit">入力内容を確認</button>
-      </form>
-    </div>
-  </body>
-  <a href="{% url 'logs:index' %}">index</a>
-</html>
 
 
+<h2>必須アイテム入力フォーム</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" name="submit_list">リスト送信</button>
+</form>
+
+<hr>
+
+<h2>今日のToDo追加</h2>
+<form method="post">
+  {% csrf_token %}
+  <input type="text" name="task" placeholder="新しいタスク">
+  <button type="submit" name="submit_task">タスク追加</button>
+</form>
+
+<h3>今日のToDoリスト</h3>
+<ul>
+  {% for task in tasks %}
+    <li>{{ task.task }}</li>
+  {% empty %}
+    <li>まだタスクがありません。</li>
+  {% endfor %}
+</ul>
