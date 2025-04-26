@@ -19,7 +19,7 @@ def sign_in(request):
   
 def log_out(request):
     logout(request)
-    return render(request, 'accouts/log_in.html')
+    return render(request, 'accounts/log_in.html')
     
   
   
@@ -33,6 +33,6 @@ def log_in(request):
         return redirect('logs:index')
       else:
         messages.error(request, 'ユーザー名 or パスワードの誤り')
-        return redirect('accoutns:log_in')
+        return redirect('accounts:log_in')
       
-    return render(request, 'accounts/log_in.html')
+    return render(request, 'logs/top.html')

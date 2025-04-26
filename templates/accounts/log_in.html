@@ -1,6 +1,6 @@
 <h2>Log in</h2>
 <form method="post">
-  {%csrf_tokeb%}
+  {% csrf_token %}
   ユーザー名：<input type="text" name="username"><br>
   パスワード：<input type="passward" name="passward"><br>
   <button type="submit">ログイン</button>

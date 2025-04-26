@@ -1,11 +1,36 @@
-<a href="{% url 'logs:index'  %}">INDEXへ！！</a>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>タスクリスト</title>
+</head>
+<body>
+    <!-- INDEXページへのリンク -->
+    <a href="{% url 'logs:index' %}">INDEXへ！！</a>
 
+    <!-- TodoListの日付表示 -->
+    <h2>{{ list.date }} のタスクリスト</h2>
 
-<h2>明日持っていくべきもの一覧</h2>
-<ul>
-  <li>{{ form.as_p }}</li>
-</ul>
-<button type='submit'>Add</button>
-{% comment %} 合っているかの確認を行う必要がある。 {% endcomment %}
+    <!-- タスクの一覧表示 -->
+    <ul>
+        {% for task in tasks %}
+            <li>{{ task.task }}</li>  <!-- 各TodoItemのtaskを表示 -->
+        {% empty %}
+            <li>まだタスクがありません。</li>  <!-- タスクがない場合 -->
+        {% endfor %}
+    </ul>
 
-<a href="{% url 'suggestions:list_form' %}">Back</a>
+    <!-- 新しいTodoItemを追加するフォームのリンク -->
+    <a href="{% url 'suggestions:list_form' %}">Back</a>
+
+    <!-- タスクリストの作成ボタンなどを追加する場合 -->
+    <form method="post">
+        {% csrf_token %}
+        <label for="new_task">新しいタスク:</label>
+        <input type="text" name="new_task" id="new_task" required>
+        <button type="submit">タスクを追加</button>
+    </form>
+
+</body>
+</html>

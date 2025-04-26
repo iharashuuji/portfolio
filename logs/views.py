@@ -8,6 +8,7 @@ import os
 from django.conf import settings
 import joblib
 from datetime import timedelta
+from suggestions.models import TodoList, TodoItem
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -45,18 +46,24 @@ def top(request):
 
     return render(request, 'logs/top.html', {'form': form, 'date':date})
 
-@login_required
 def index(request): 
     # ↓ 昨日の日付に変更（ここを修正済み）
     yesterday = now().date() - timedelta(days=1)
-    yesterday_log = Log.objects.filter(date=yesterday).first()  # ← 存在しない可能性もあるので .first()
+    today = now().date()
+    today_list = TodoList.objects.filter(date=today).first()# ← 存在しない可能性もあるので .first()
+    yesterday_log = Log.objects.filter(date=yesterday).first()# ← 存在しない可能性もあるので .first()
+    yesterday_log = Log.objects.filter(date=yesterday).first()# ← 存在しない可能性もあるので .first()
+    yesterday_list = TodoList.objects.filter(date=yesterday).first()# ← 存在しない可能性もあるので .first()
 
     # ↓ 昨日のログがあれば、その suggestions を使う（ここを修正済み）
     suggestions = yesterday_log.suggestions.all() if yesterday_log else []
+    suggestions_today = today_list.items.all() if today_list else []
     logs = Log.objects.all()
     last_log = logs.last()
     prediction = request.session.pop('prediction', None)
         # 安全に float 変換（None 対応込み）
+        #   list = get_object_or_404(TodoList, id=list_id)
+        #   tasks = list.items.all()
     try:
         if prediction is not None:
             prediction = float(prediction)  # ← 修正済み：ここで str を float に変換
@@ -70,6 +77,7 @@ def index(request):
         'prediction': prediction,
         'last_log':last_log,
         'suggestions': suggestions,
+        'suggestions_today':suggestions_today,
     })
 
 # logは、回答を受信し、送信する関数
@@ -91,7 +99,6 @@ def log(request):
   
 from django.utils.timezone import now
 
-@login_required
 def log_form(request, log_id=None):
     if log_id:
         return redirect('logs:log_form_edit', log_id=log_id)
@@ -145,7 +152,6 @@ def log_form(request, log_id=None):
 
  
  # 既存のFORMの編集用
-@login_required
 def log_form_edit(request, log_id):
   # 既存のものを見つける。
   log = get_object_or_404(Log, id=log_id)

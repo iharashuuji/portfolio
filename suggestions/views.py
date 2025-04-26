@@ -1,13 +1,14 @@
 from django.shortcuts import render
-from .models import List
-from .forms import ListForm
 from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
-from .forms import TodoListCreateForm
+from .forms import TodoListCreateForm, TodoItemForm
 from .models import TodoList, TodoItem
 from datetime import date
 from django.contrib.auth.decorators import login_required
+from datetime import timedelta
+from logs.models import Log
+from .models import get_today_log
 
 
 # Create your views here.
@@ -15,78 +16,72 @@ from django.contrib.auth.decorators import login_required
 # 必要要件：忘れ物の確率が５０％を超えた際に、
 # 忘れ物に関して記述を行っておライその記述されたものを通知で知らせるようにする。
 # なので必要なカラムに関しては、入力してもらったデータをモデルに送信を行う為のカラム
-@login_required
 def list(request):
   if request.method == 'POST':
-    list = List()
+    list = TodoList()  # LISTから変更済み
     forget_item_1 = request.POST.get('forget_item_1')
     list.save()
     return render(request, 'suggestions/list.html') 
-@login_required
+
 def list_form(request):
-    today = date.today()
-    today_list, created = TodoList.objects.get_or_create(date=today)
-    tasks = today_list.items.all()
+    today = date.today() #+ timedelta(days=1)
+    # yesterday = date.today() - timedelta(days=1)
+    log = get_today_log()
+    try:
+        today_list = TodoList.objects.get(date=today)
+    except TodoList.DoesNotExist:
+        today_list = None    
+    tasks = today_list.items.all() if today_list else []
+    
 
     # ListFormの処理
-    if request.method == 'POST' and 'submit_list' in request.POST:
-        form = ListForm(request.POST)
-        if form.is_valid():
-            data = form.cleaned_data
-            list_obj = List()
-            list_obj.must_item_1 = data['must_item_1']
-            list_obj.save()
-            return redirect('suggestions:show', list_id=list_obj.id)
-    else:
-        form = ListForm()
+    if request.method == 'POST' :
+      if today_list:
+          return redirect('suggestions:show', list_id=today_list.id)
+      else:
+        form = TodoListCreateForm(request.POST)
+        task_formset = TodoItemForm(request.POST)
+        if form.is_valid() and task_formset.is_valid():
+        # まずリスト（親）を保存
+          today_list = form.save(commit=False)
+          today_list.log = log  # logは自動でセット
+          today_list.date = today  # 日付も手動でセット
+          today_list.save()
 
-    # Todo追加処理
-    if request.method == 'POST' and 'submit_task' in request.POST:
-        task_text = request.POST.get('task', '').strip()
-        if task_text:
-            TodoItem.objects.create(list=today_list, task=task_text)
-            return redirect('suggestions:list_form')  # 自分にリダイレクト
+        # 次にタスク（子）たちを保存
+          task_formset.instance = today_list  # 紐づけ
+          task_formset.save()
+          return redirect('suggestions:show', list_id=today_list.id)
+    else:
+        form = TodoListCreateForm()
+        task_formset = TodoItemForm()
+
+
 
     return render(request, 'suggestions/list_form.html', {
         'form': form,
         'tasks': tasks,
         'today_list': today_list,
-        'is_new': created
     })
 
-@login_required
 def show(request, list_id):
-  list = get_object_or_404(List, id=list_id)
-  return render(request, 'suggestions/show.html', {'list': list})
+  list = get_object_or_404(TodoList, id=list_id)
+  tasks = list.items.all()
+  if request.method == 'POST':
+    task_text = request.POST.get('new_task','').strip() #昨日のTASKをいったん全て取得
+    if task_text:
+      #if task_text: # ここで、タスクがあるかを確認。ただ確認する意味はない。
+      TodoItem.objects.create(list=list, task=task_text) #
+      tasks = list.items.all()
+  return render(request, 'suggestions/show.html', {'list': list, 'tasks': tasks})
 
 
-#　TO ｄOをリスト作成
-def create_todo_list(request):
-    if request.method == 'POST':
-        form = TodoListCreateForm(request.POST)
-        if form.is_valid():
-            # TodoListを作成
-            todo_list = TodoList.objects.create(title=form.cleaned_data['title'])
-            
-            # タスクを改行で分割して登録
-            tasks_text = form.cleaned_data['tasks']
-            task_lines = tasks_text.strip().split('\n')
-            for line in task_lines:
-                if line.strip():
-                    TodoItem.objects.create(list=todo_list, task=line.strip())
-            
-            # 作成完了後、リスト表示ページにリダイレクト
-            return redirect('logs:index')
-    else:
-        form = TodoListCreateForm()
-
-    return render(request, 'suggestions/list_form.html', {'form': form})
 
 def today_todo(request):
-  today = date.today()
-  today_list, created = TodoList.objects.get_or_create(date=today)
+  yesterday = date.today() - timedelta(days=1)
+  today_list, created = TodoList.objects.get_or_create(date=yesterday)
   tasks = today_list.items.all()
-  if request == 'POST':
+  if request.method   == 'POST':
     task_text = request.POST.get('task','').strip()
     if task_text:
       TodoItem.objects.create(list=today_list, task=task_text)
@@ -95,3 +90,14 @@ def today_todo(request):
                 {'tasks': tasks,
                  'today_list': today_list,
                  'is_new': created}) 
+  
+  
+      # Todo追加処理
+    # yesterday = date.today() - timedelta(days=1)
+    # yesterday_list, created = TodoList.objects.get_or_create(date=yesterday)
+
+    # if request.method == 'POST':
+    #     task_text = request.POST.get('task', '').strip()
+    #     if task_text:
+    #         TodoItem.objects.create(list=yesterday_list, task=task_text)
+    #         return redirect('suggestions:list_form')

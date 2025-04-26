@@ -48,6 +48,18 @@
       {% else %}
           <p>今日のやるべきことはありません。</p>
       {% endif %}
+      {% if suggestions_today %}
+      <ul>
+        {% for suggestion in suggestions_today %}
+            <li>
+          {{ suggestion.task }}<br>
+
+            </li>
+        {% endfor %}
+        </ul>
+      {% else %}
+        <p>今日のやるべきことはありません。</p>
+      {% endif %}
 
     </section>
 </main>

@@ -1,22 +1,22 @@
 
 
 
-<h2>必須アイテム入力フォーム</h2>
+ <h2>必須アイテム入力フォーム</h2>
 <form method="post">
   {% csrf_token %}
   {{ form.as_p }}
   <button type="submit" name="submit_list">リスト送信</button>
 </form>
 
-<hr>
+<hr> 
 
 <h2>今日のToDo追加</h2>
 <form method="post">
   {% csrf_token %}
   <input type="text" name="task" placeholder="新しいタスク">
   <button type="submit" name="submit_task">タスク追加</button>
-</form>
-
+</form> 
+{% comment %} 
 <h3>今日のToDoリスト</h3>
 <ul>
   {% for task in tasks %}
@@ -24,4 +24,4 @@
   {% empty %}
     <li>まだタスクがありません。</li>
   {% endfor %}
-</ul>
+</ul> {% endcomment %}
