@@ -40,21 +40,22 @@ def list_form(request):
           return redirect('suggestions:show', list_id=today_list.id)
       else:
         form = TodoListCreateForm(request.POST)
-        task_formset = TodoItemForm(request.POST)
-        if form.is_valid() and task_formset.is_valid():
+        if form.is_valid() :
         # まずリスト（親）を保存
           today_list = form.save(commit=False)
           today_list.log = log  # logは自動でセット
           today_list.date = today  # 日付も手動でセット
           today_list.save()
-
+          task_formset = TodoItemForm(request.POST, instance=today_list)
         # 次にタスク（子）たちを保存
-          task_formset.instance = today_list  # 紐づけ
-          task_formset.save()
-          return redirect('suggestions:show', list_id=today_list.id)
+          if task_formset.is_valid():
+            task_formset.save()
+            return redirect('suggestions:show', list_id=today_list.id)
+
     else:
         form = TodoListCreateForm()
-        task_formset = TodoItemForm()
+        dummy_list = TodoList()
+        task_formset = TodoItemForm(instance=dummy_list)
 
 
 
@@ -62,6 +63,7 @@ def list_form(request):
         'form': form,
         'tasks': tasks,
         'today_list': today_list,
+        'task_formset' : task_formset,
     })
 
 def show(request, list_id):
@@ -91,13 +93,3 @@ def today_todo(request):
                  'today_list': today_list,
                  'is_new': created}) 
   
-  
-      # Todo追加処理
-    # yesterday = date.today() - timedelta(days=1)
-    # yesterday_list, created = TodoList.objects.get_or_create(date=yesterday)
-
-    # if request.method == 'POST':
-    #     task_text = request.POST.get('task', '').strip()
-    #     if task_text:
-    #         TodoItem.objects.create(list=yesterday_list, task=task_text)
-    #         return redirect('suggestions:list_form')

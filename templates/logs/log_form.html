@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="ja">
+<head>
+    {% load static %}
+    <link rel="stylesheet", href="{% static 'logs/css/log_form.css' %}">
+    <script src="{% static 'logs/js/log_form.js' %}"></script>
+</head>
 <body>
+{% include "sidebar.html" %} 
+
   <div class="container text-center">
     <form method="post">
       {% csrf_token %}

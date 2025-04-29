@@ -21,7 +21,7 @@ TodoItemForm = inlineformset_factory(
 #             'task': forms.TextInput(attrs={'placeholder': '忘れ物1'}),
 #         }
         
-class TodoListCreateForm(forms.Form):
+class TodoListCreateForm(forms.ModelForm):
     class Meta:
         model = TodoList
         title = forms.CharField(label='リスト名', max_length=100)

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toggle Sidebar Example</title>
+  <link rel="stylesheet" href="{% static 'sidebar.css' %}">
+</head>
+<body>
+
+  <button>Toggle Sidebar</button>
+
+  <div id="sidebar" class="sidebar">
+    <span id="close-btn" class="close-btn">&times;</span> <!-- 閉じるボタン -->
+    <h2>Sidebar</h2>
+    <ul>
+      <li><a href="{% url 'logs:index' %}">INDEX</a></li>
+      <li><a href="{% url 'suggestions:list_form' %}">タスクリスト作成</a></li>
+      <li><a href="{% url 'logs:log_form' %}">ログ入力</a></li>
+    </ul>
+  </div>
+
+  <script src="{% static 'sidebar.js' %}"></script>
+</body>
+</html>

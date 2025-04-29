@@ -1,4 +1,10 @@
 <main>
+  <head>
+    {% load static %}
+    <link rel="stylesheet", href="{% static 'logs/css/style.css' %}">
+    <script src="{% static 'logs/js/script.js' %}"></script>
+  </head>
+    {% include "sidebar.html" %} 
     <section class="confirm_will_forget">
       {% comment %} ２回目の入力に忘れ物をしたかを聞く機能 {% endcomment %}
       {% if last_log and last_log.will_forget == None %}

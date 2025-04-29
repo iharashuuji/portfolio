@@ -1,27 +1,33 @@
+<head>
+  {% load static %}
+  <link rel="stylesheet", href="{% static 'suggestions/css/list_form.css' %}">
+  <script src="{% static 'suggestions/css/list_form.js' %}"></script>
+</head>
+
+{% include "sidebar.html" %} 
 
 
 
- <h2>必須アイテム入力フォーム</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit" name="submit_list">リスト送信</button>
-</form>
 
 <hr> 
 
-<h2>今日のToDo追加</h2>
+{% comment %} <h2>今日のToDo追加</h2>
 <form method="post">
   {% csrf_token %}
   <input type="text" name="task" placeholder="新しいタスク">
-  <button type="submit" name="submit_task">タスク追加</button>
-</form> 
-{% comment %} 
-<h3>今日のToDoリスト</h3>
-<ul>
-  {% for task in tasks %}
-    <li>{{ task.task }}</li>
-  {% empty %}
-    <li>まだタスクがありません。</li>
+  <button type="submit" name="submit_list">タスク追加</button>
+</form>  {% endcomment %}
+
+
+
+<h2>必須アイテム入力フォーム</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  {{ task_formset.management_form }} 
+  {% for form in task_formset %}
+    {{ form.as_p }}
   {% endfor %}
-</ul> {% endcomment %}
+  {{ task_formset.as_p }}
+  <button type="submit" name="submit_list">リスト送信</button>
+</form> 

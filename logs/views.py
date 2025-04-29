@@ -20,9 +20,6 @@ from django.shortcuts import get_object_or_404
 
 
 
-
-
-
 # Create your views here.
 # This is a controller in Rails
 
@@ -56,7 +53,7 @@ def index(request):
     yesterday_list = TodoList.objects.filter(date=yesterday).first()# ← 存在しない可能性もあるので .first()
 
     # ↓ 昨日のログがあれば、その suggestions を使う（ここを修正済み）
-    suggestions = yesterday_log.suggestions.all() if yesterday_log else []
+    suggestions = yesterday_log.list_suggestions.all() if yesterday_log else []
     suggestions_today = today_list.items.all() if today_list else []
     logs = Log.objects.all()
     last_log = logs.last()
