@@ -3,7 +3,7 @@ from .models import TodoList, TodoItem
 from django.forms import inlineformset_factory
 from .models import TodoList, TodoItem
 
-TodoItemForm = inlineformset_factory(
+TodoItemFormSet = inlineformset_factory(
     TodoList,
     TodoItem,
     fields=('task',),

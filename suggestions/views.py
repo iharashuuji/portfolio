@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
-from .forms import TodoListCreateForm, TodoItemForm
+from .forms import TodoListCreateForm, TodoItemFormSet
 from .models import TodoList, TodoItem
 from datetime import date
 from django.contrib.auth.decorators import login_required
@@ -46,7 +46,7 @@ def list_form(request):
           today_list.log = log  # logは自動でセット
           today_list.date = today  # 日付も手動でセット
           today_list.save()
-          task_formset = TodoItemForm(request.POST, instance=today_list)
+          task_formset = TodoItemFormSet(request.POST, instance=today_list)
         # 次にタスク（子）たちを保存
           if task_formset.is_valid():
             task_formset.save()
@@ -55,7 +55,7 @@ def list_form(request):
     else:
         form = TodoListCreateForm()
         dummy_list = TodoList()
-        task_formset = TodoItemForm(instance=dummy_list)
+        task_formset = TodoItemFormSet(instance=dummy_list)
 
 
 
