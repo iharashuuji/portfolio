@@ -12,7 +12,12 @@
       {% else %}
       <a href="{% url 'logs:log_form' %}">TO LogForm</a>
       {% endif %}
-      <p>will_forget: {{ last_log.will_forget }}</p>
+      {% comment %} 予測結果があるかを表している項目 {% endcomment %}
+      {% if last_log.will_forget %}
+        <p>今日は入力済み！</p>
+      {% else %}
+        <p>まだ今日は入力されていない！</p>
+      {% endif %}
     </section>
     <section class="Note_forget_item">
       {% comment %} 忘れ物をする確率を５０％を超えた際に、持っていくべきものをTo Doまで自動で落とし込む {% endcomment %}
@@ -30,7 +35,6 @@
         {% if prediction is not None %}
           <h2>予測結果: {{ prediction }}%</h2>
         {% else %}
-          <p>予測結果はまだありません。</p>
         {% endif %}
         </th>
       </table>
@@ -38,22 +42,7 @@
     <section class="to_do_list">
       <h1>今日のやるべきこと</h1>
 
-      {% if suggestions %}
-          <ul>
-          {% for suggestion in suggestions %}
-              <li>
-            {{ suggestion.must_item_1 }}<br>
-            {{ suggestion.must_item_2 }}<br>
-            {{ suggestion.must_item_3 }}<br>
-            {{ suggestion.must_item_4 }}<br>
-            {{ suggestion.must_item_5 }}<br>
-            {{ suggestion.must_item_6 }}<br>
-              </li>
-          {% endfor %}
-          </ul>
-      {% else %}
-          <p>今日のやるべきことはありません。</p>
-      {% endif %}
+
       {% if suggestions_today %}
       <ul>
         {% for suggestion in suggestions_today %}
@@ -65,6 +54,20 @@
         </ul>
       {% else %}
         <p>今日のやるべきことはありません。</p>
+      {% endif %}
+
+
+      {% if suggestions %}
+      <ul>
+        {% for suggestion in suggestions %}
+            <li>
+          {{ suggestion.task }}<br>
+
+            </li>
+        {% endfor %}
+        </ul>
+      {% else %}
+        <p>昨日のやるべきことはありません。</p>
       {% endif %}
 
     </section>

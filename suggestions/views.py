@@ -25,13 +25,18 @@ def list(request):
 
 def list_form(request):
     today = date.today() #+ timedelta(days=1)
-    # yesterday = date.today() - timedelta(days=1)
+    yesterday = date.today() - timedelta(days=1)
     log = get_today_log()
     try:
         today_list = TodoList.objects.get(date=today)
     except TodoList.DoesNotExist:
-        today_list = None    
+        today_list = None   
+    try:
+        yesterday_list = TodoList.objects.get(date=yesterday)
+    except TodoList.DoesNotExist:
+        yesterday_list = None   
     tasks = today_list.items.all() if today_list else []
+    tasks_yesterday = yesterday_list.items.all() if yesterday_list else []
     
 
     # ListFormの処理
@@ -48,6 +53,7 @@ def list_form(request):
           today_list.save()
           task_formset = TodoItemFormSet(request.POST, instance=today_list)
         # 次にタスク（子）たちを保存
+          
           if task_formset.is_valid():
             task_formset.save()
             return redirect('suggestions:show', list_id=today_list.id)
@@ -64,6 +70,7 @@ def list_form(request):
         'tasks': tasks,
         'today_list': today_list,
         'task_formset' : task_formset,
+        'tasks_yesterday': tasks_yesterday,
     })
 
 def show(request, list_id):
