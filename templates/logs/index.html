@@ -14,9 +14,9 @@
       {% endif %}
       {% comment %} 予測結果があるかを表している項目 {% endcomment %}
       {% if last_log.will_forget %}
-        <p>今日は入力済み！</p>
+        <p>あなたの確率は！</p>
       {% else %}
-        <p>まだ今日は入力されていない！</p>
+        <p>あなたの今日の確率を知ろう！</p>
       {% endif %}
     </section>
     <section class="Note_forget_item">
@@ -72,3 +72,13 @@
 
     </section>
 </main>
+
+
+
+{% comment %}  {% endcomment %}
+  <form method="post">
+      {% csrf_token %}
+      <label for="new_task">新しいタスク:</label>
+      <input type="text" name="new_task" id="new_task" required>
+      <button type="submit">タスクを追加</button>
+  </form>

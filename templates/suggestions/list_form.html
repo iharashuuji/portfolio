@@ -24,10 +24,10 @@
 <form method="post">
   {% csrf_token %}
   {{ form.as_p }}
-  {{ task_formset.management_form }} 
+  {{ task_formset.management_form }}
   {% for form in task_formset %}
     {{ form.as_p }}
-  {% endfor %}
-  {{ task_formset.as_p }}
+  {% endfor %} 
+  {{ task_formset.as_p }} 
   <button type="submit" name="submit_list">リスト送信</button>
 </form> 

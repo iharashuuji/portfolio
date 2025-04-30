@@ -37,11 +37,12 @@ def list_form(request):
         yesterday_list = None   
     tasks = today_list.items.all() if today_list else []
     tasks_yesterday = yesterday_list.items.all() if yesterday_list else []
-    
+    task_formset = None
 
     # ListFormの処理
     if request.method == 'POST' :
       if today_list:
+          print('TOdolist exists')
           return redirect('suggestions:show', list_id=today_list.id)
       else:
         form = TodoListCreateForm(request.POST)
@@ -57,6 +58,9 @@ def list_form(request):
           if task_formset.is_valid():
             task_formset.save()
             return redirect('suggestions:show', list_id=today_list.id)
+          else:
+            dummy_list = TodoList()
+            task_formset = TodoItemFormSet(request.POST, instance=dummy_list)
 
     else:
         form = TodoListCreateForm()

@@ -9,11 +9,11 @@ from django.conf import settings
 import joblib
 from datetime import timedelta
 from suggestions.models import TodoList, TodoItem
-
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect
 from datetime import date
+from django.db.models import Q
 from django.utils.timezone import now
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
@@ -69,10 +69,33 @@ def index(request):
             prediction=None
     except ValueError:
         prediction = None
+        
+        
+    ###########
+    list = TodoList.objects.filter(Q(date=today) | Q(date=yesterday)).order_by('-date').first()
+# 変数task_textを初期化
+    task_text = None
+
+# TodoListの取得
+    list = TodoList.objects.filter(Q(date=today) | Q(date=yesterday)).order_by('-date').first()
+    tasks = list.items.all()
+
+    if request.method == 'POST':
+    # POSTデータからタスクテキストを取得
+        task_text = request.POST.get('new_task', '').strip()
+    
+    # task_textが空でない場合にタスクを作成
+    if task_text:
+        TodoItem.objects.create(list=list, task=task_text)
+        tasks = list.items.all()  # 更新されたタスクリストを取得
+    ############
+    
+    
     return render(request, 'logs/index.html',{
         'logs': logs,
         'prediction': prediction,
         'last_log':last_log,
+        'tasks': tasks,
         'suggestions': suggestions,
         'suggestions_today':suggestions_today,
     })
