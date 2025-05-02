@@ -87,7 +87,7 @@
         <p>昨日のやるべきことはありません。</p>
       {% endif %}  {% endcomment %}
 
-      {% if yesterday_list %}
+      {% comment %} {% if yesterday_list %}
       <ul>
         {% for suggestion in yesterday_item %}
             <li>
@@ -97,8 +97,23 @@
         </ul>
       {% else %}
         <p>昨日のやるべきことはありません。</p>
-      {% endif %} 
+      {% endif %}  {% endcomment %}
 
+<!--問題点：昨日のやるべき事がある想定なのに表示がされていない状況）のデバッグ用-->
+     <h1>昨日に入力されたやるべき事</h1>
+      {% if yesterday_item %}
+      <ul>
+      {% for suggestion in yesterday_item %}
+        <form action="{% url "suggestions:delete" item_id=suggestion.id %}"  method="post">
+          {{ suggestion.task }}
+          {% csrf_token %}
+          <button type="submit">削除</button>
+        </form>
+      {% endfor %}
+      </ul>
+      {% else %}
+        <p>昨日のやるべきことはありません。</p>
+      {% endif %}
 
 
 

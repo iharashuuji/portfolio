@@ -81,7 +81,7 @@ def show(request, list_id):
   today = now().date()
   list = TodoList.objects.filter(date=today).order_by('-created_at').first()
   if not list:  # 今日のリストが存在しない場合、新たに作成
-    list = TodoList.objects.create(date=today)
+    list, created = TodoList.objects.get_or_create(date=today)
   tasks = list.items.all()
   if request.method == 'POST':
     task_text = request.POST.get('new_task','').strip() #昨日のTASKをいったん全て取得
