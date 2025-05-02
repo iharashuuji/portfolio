@@ -1,25 +1,40 @@
+<head>
+  {% load static %}
+  <link rel="stylesheet", href="{% static 'logs/css/index.css' %}">
+  <script src="{% static 'logs/js/index.js' %}"></script>
+</head>
 <main>
-  <head>
-    {% load static %}
-    <link rel="stylesheet", href="{% static 'logs/css/style.css' %}">
-    <script src="{% static 'logs/js/script.js' %}"></script>
-  </head>
-    {% include "sidebar.html" %} 
+    <header>
+      {% include "sidebar.html" %}
+    </header>
+    <body>
     <section class="confirm_will_forget">
-      {% comment %} ２回目の入力に忘れ物をしたかを聞く機能 {% endcomment %}
-      {% if last_log and last_log.will_forget == None %}
-      <a href="{% url 'logs:log_form_edit' last_log.id%}">TO LogForm</a>
-      {% else %}
-      <a href="{% url 'logs:log_form' %}">TO LogForm</a>
-      {% endif %}
-      {% comment %} 予測結果があるかを表している項目 {% endcomment %}
-      {% if last_log.will_forget %}
-        <p>あなたの確率は！</p>
-      {% else %}
-        <p>あなたの今日の確率を知ろう！</p>
-      {% endif %}
+      
+        {% comment %} ２回目の入力に忘れ物をしたかを聞く機能 {% endcomment %}
+        {% if last_log and last_log.will_forget == None %}
+          <a href="{% url 'logs:log_form_edit' last_log.id%}">TO LogForm</a>
+        {% else %}
+          <a href="{% url 'logs:log_form' %}">TO LogForm</a>
+        {% endif %}
+        {% comment %} 予測結果があるかを表している項目 {% endcomment %}
+        {% if last_log.will_forget %}
+          <p>あなたの確率は！</p>
+        {% else %}
+          <p>あなたの今日の確率を知ろう！</p>
+        {% endif %}
     </section>
-    <section class="Note_forget_item">
+    {% comment %} 予測結果の表示を行う {% endcomment %}
+    <section class="show_prediction">
+          <table class="table">
+            <th>
+            {% if prediction is not None %}
+              <h2>予測結果: {{ prediction }}%</h2>
+            {% else %}
+            {% endif %}
+            </th>
+          </table>
+    </section>
+    <section class="note_forget_item">
       {% comment %} 忘れ物をする確率を５０％を超えた際に、持っていくべきものをTo Doまで自動で落とし込む {% endcomment %}
       {% if prediction and prediction > 0.5 %}
       <form action="{% url 'suggestions:list_form' %}" method="post">
@@ -28,22 +43,12 @@
       </form>
       {% endif %}
     </section>
-    {% comment %} 予測結果の表示を行う {% endcomment %}
-    <section class="show_prediction">
-      <table class="table">
-        <th>
-        {% if prediction is not None %}
-          <h2>予測結果: {{ prediction }}%</h2>
-        {% else %}
-        {% endif %}
-        </th>
-      </table>
-    </section>
+
     <section class="to_do_list">
       <h1>今日のやるべきこと</h1>
 
 
-      {% if suggestions_today %}
+      {% comment %} {% if suggestions_today %}
       <ul>
         {% for suggestion in suggestions_today %}
             <li>
@@ -54,12 +59,13 @@
         </ul>
       {% else %}
         <p>今日のやるべきことはありません。</p>
-      {% endif %}
+      {% endif %} {% endcomment %}
 
+      {% comment %}  {% endcomment %}
 
-      {% if suggestions %}
+      {% if tasks %}
       <ul>
-        {% for suggestion in suggestions %}
+        {% for suggestion in tasks %}
             <li>
           {{ suggestion.task }}<br>
 
@@ -67,15 +73,48 @@
         {% endfor %}
         </ul>
       {% else %}
-        <p>昨日のやるべきことはありません。</p>
+        <p>今日のやるべきことはありません。</p>
       {% endif %}
 
+      {% comment %}  {% endcomment %}
+
+      {% if suggestions %}
+      <ul>
+        {% for suggestion in suggestions %}
+            <li>
+          {{ suggestion.task }}<br>
+            </li>
+        {% endfor %}
+        </ul>
+      {% else %}
+        <p>昨日のやるべきことはありません。</p>
+      {% endif %} 
+      {% comment %} デバッグ用 {% endcomment %}
+      {% if suggestions %}
+      <ul>
+        {% for suggestion in suggestions %}
+            <li>{{ suggestion }}</li> <!-- suggestion の内容をそのまま表示 -->
+            <li>{{ suggestion.task }}</li> <!-- task が正しく表示されるか確認 -->
+        {% endfor %}
+      </ul>
+      {% else %}
+         <p>No suggestions found.</p>
+      {% endif %}
+
+      {% if suggestions_len > 0 %}
+        <p>デバッグ成功</p>
+      {%endif%}
     </section>
+    </body>
+
+    <footer>
+    </footer>
+
 </main>
 
 
 
-{% comment %}  {% endcomment %}
+{% comment %} タスクを追加出来るタブ作成 {% endcomment %}
   <form method="post">
       {% csrf_token %}
       <label for="new_task">新しいタスク:</label>

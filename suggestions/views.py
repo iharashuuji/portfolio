@@ -28,7 +28,7 @@ def list_form(request):
     yesterday = date.today() - timedelta(days=1)
     log = get_today_log()
     try:
-        today_list = TodoList.objects.get(date=today)
+        today_list = TodoList.objects.filter(date=today).order_by('-created_at').first()
     except TodoList.DoesNotExist:
         today_list = None   
     try:
@@ -42,8 +42,8 @@ def list_form(request):
     # ListFormの処理
     if request.method == 'POST' :
       if today_list:
-          print('TOdolist exists')
-          return redirect('suggestions:show', list_id=today_list.id)
+        today_list.save()
+        return redirect('suggestions:show', list_id=today_list.id)
       else:
         form = TodoListCreateForm(request.POST)
         if form.is_valid() :
@@ -78,7 +78,8 @@ def list_form(request):
     })
 
 def show(request, list_id):
-  list = get_object_or_404(TodoList, id=list_id)
+  today = now().date()
+  list = TodoList.objects.filter(date=today).order_by('-created_at').first()
   tasks = list.items.all()
   if request.method == 'POST':
     task_text = request.POST.get('new_task','').strip() #昨日のTASKをいったん全て取得

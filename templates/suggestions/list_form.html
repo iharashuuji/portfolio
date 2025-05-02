@@ -28,6 +28,6 @@
   {% for form in task_formset %}
     {{ form.as_p }}
   {% endfor %} 
-  {{ task_formset.as_p }} 
+  {% comment %} {{ task_formset.as_p }}  {% endcomment %}
   <button type="submit" name="submit_list">リスト送信</button>
 </form> 

@@ -54,6 +54,7 @@ def index(request):
 
     # ↓ 昨日のログがあれば、その suggestions を使う（ここを修正済み）
     suggestions = yesterday_log.list_suggestions.all() if yesterday_log else []
+    suggestions_len = len(suggestions)
     suggestions_today = today_list.items.all() if today_list else []
     logs = Log.objects.all()
     last_log = logs.last()
@@ -97,6 +98,8 @@ def index(request):
         'last_log':last_log,
         'tasks': tasks,
         'suggestions': suggestions,
+        # suggestions のデバッグ用
+        'suggestions_len':suggestions_len,
         'suggestions_today':suggestions_today,
     })
 

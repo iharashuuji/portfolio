@@ -31,8 +31,8 @@ from datetime import date
   
 # ＴｏＤＯＩＴＥＭをまとめるためのもの
 class TodoList(models.Model):
-  title = models.CharField(max_length=100)
-  date = models.DateField(default=date.today)
+  # title = models.CharField(max_length=100)
+  date = models.DateField(default=date.today, unique=True)
   log = models.ForeignKey(
         LogModel,
         on_delete=models.CASCADE,
