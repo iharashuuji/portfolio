@@ -47,14 +47,12 @@ def index(request):
     # ↓ 昨日の日付に変更（ここを修正済み）
     yesterday = now().date() - timedelta(days=1)
     today = now().date()
-    today_list = TodoList.objects.filter(date=today).first()# ← 存在しない可能性もあるので .first()
-    yesterday_log = Log.objects.filter(date=yesterday).first()# ← 存在しない可能性もあるので .first()
-    yesterday_log = Log.objects.filter(date=yesterday).first()# ← 存在しない可能性もあるので .first()
-    yesterday_list = TodoList.objects.filter(date=yesterday).first()# ← 存在しない可能性もあるので .first()
+    today_list = TodoList.objects.filter(date=today).first()
+    yesterday_log = Log.objects.filter(date=yesterday).first()
+
 
     # ↓ 昨日のログがあれば、その suggestions を使う（ここを修正済み）
     suggestions = yesterday_log.list_suggestions.all() if yesterday_log else []
-    suggestions_len = len(suggestions)
     suggestions_today = today_list.items.all() if today_list else []
     logs = Log.objects.all()
     last_log = logs.last()
@@ -73,13 +71,14 @@ def index(request):
         
         
     ###########
-    list = TodoList.objects.filter(Q(date=today) | Q(date=yesterday)).order_by('-date').first()
 # 変数task_textを初期化
     task_text = None
 
 # TodoListの取得
-    list = TodoList.objects.filter(Q(date=today) | Q(date=yesterday)).order_by('-date').first()
+    list = TodoList.objects.filter(date=today).order_by('-date').first()
     tasks = list.items.all()
+    yesterday_list = TodoList.objects.filter(date=yesterday).first()
+    yesterday_item = yesterday_list.items.all()
 
     if request.method == 'POST':
     # POSTデータからタスクテキストを取得
@@ -97,9 +96,10 @@ def index(request):
         'prediction': prediction,
         'last_log':last_log,
         'tasks': tasks,
+        'yesterday_item':yesterday_item,
+        'today_list':today_list,
         'suggestions': suggestions,
         # suggestions のデバッグ用
-        'suggestions_len':suggestions_len,
         'suggestions_today':suggestions_today,
     })
 

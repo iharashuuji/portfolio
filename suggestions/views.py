@@ -23,63 +23,65 @@ def list(request):
     list.save()
     return render(request, 'suggestions/list.html') 
 
-def list_form(request):
-    today = date.today() #+ timedelta(days=1)
-    yesterday = date.today() - timedelta(days=1)
-    log = get_today_log()
-    try:
-        today_list = TodoList.objects.filter(date=today).order_by('-created_at').first()
-    except TodoList.DoesNotExist:
-        today_list = None   
-    try:
-        yesterday_list = TodoList.objects.get(date=yesterday)
-    except TodoList.DoesNotExist:
-        yesterday_list = None   
-    tasks = today_list.items.all() if today_list else []
-    tasks_yesterday = yesterday_list.items.all() if yesterday_list else []
-    task_formset = None
+# def list_form(request):
+#     today = date.today() #+ timedelta(days=1)
+#     yesterday = date.today() - timedelta(days=1)
+#     log = get_today_log()
+#     try:
+#         today_list = TodoList.objects.filter(date=today).order_by('-created_at').first()
+#     except TodoList.DoesNotExist:
+#         today_list = None   
+#     try:
+#         yesterday_list = TodoList.objects.get(date=yesterday)
+#     except TodoList.DoesNotExist:
+#         yesterday_list = None   
+#     tasks = today_list.items.all() if today_list else []
+#     tasks_yesterday = yesterday_list.items.all() if yesterday_list else []
+#     task_formset = None
 
-    # ListFormの処理
-    if request.method == 'POST' :
-      if today_list:
-        today_list.save()
-        return redirect('suggestions:show', list_id=today_list.id)
-      else:
-        form = TodoListCreateForm(request.POST)
-        if form.is_valid() :
-        # まずリスト（親）を保存
-          today_list = form.save(commit=False)
-          today_list.log = log  # logは自動でセット
-          today_list.date = today  # 日付も手動でセット
-          today_list.save()
-          task_formset = TodoItemFormSet(request.POST, instance=today_list)
-        # 次にタスク（子）たちを保存
+#     # ListFormの処理
+#     if request.method == 'POST' :
+#       if today_list:
+#         today_list.save()
+#         return redirect('suggestions:show', list_id=today_list.id)
+#       else:
+#         form = TodoListCreateForm(request.POST)
+#         if form.is_valid() :
+#         # まずリスト（親）を保存
+#           today_list = form.save(commit=False)
+#           today_list.log = log  # logは自動でセット
+#           today_list.date = today  # 日付も手動でセット
+#           today_list.save()
+#           task_formset = TodoItemFormSet(request.POST, instance=today_list)
+#         # 次にタスク（子）たちを保存
           
-          if task_formset.is_valid():
-            task_formset.save()
-            return redirect('suggestions:show', list_id=today_list.id)
-          else:
-            dummy_list = TodoList()
-            task_formset = TodoItemFormSet(request.POST, instance=dummy_list)
+#           if task_formset.is_valid():
+#             task_formset.save()
+#             return redirect('suggestions:show', list_id=today_list.id)
+#           else:
+#             dummy_list = TodoList()
+#             task_formset = TodoItemFormSet(request.POST, instance=dummy_list)
 
-    else:
-        form = TodoListCreateForm()
-        dummy_list = TodoList()
-        task_formset = TodoItemFormSet(instance=dummy_list)
+#     else:
+#         form = TodoListCreateForm()
+#         dummy_list = TodoList()
+#         task_formset = TodoItemFormSet(instance=dummy_list)
 
 
 
-    return render(request, 'suggestions/list_form.html', {
-        'form': form,
-        'tasks': tasks,
-        'today_list': today_list,
-        'task_formset' : task_formset,
-        'tasks_yesterday': tasks_yesterday,
-    })
+#     return render(request, 'suggestions/list_form.html', {
+#         'form': form,
+#         'tasks': tasks,
+#         'today_list': today_list,
+#         'task_formset' : task_formset,
+#         'tasks_yesterday': tasks_yesterday,
+#     })
 
 def show(request, list_id):
   today = now().date()
   list = TodoList.objects.filter(date=today).order_by('-created_at').first()
+  if not list:  # 今日のリストが存在しない場合、新たに作成
+    list = TodoList.objects.create(date=today)
   tasks = list.items.all()
   if request.method == 'POST':
     task_text = request.POST.get('new_task','').strip() #昨日のTASKをいったん全て取得
@@ -105,3 +107,9 @@ def today_todo(request):
                  'today_list': today_list,
                  'is_new': created}) 
   
+  
+def delete(request, item_id):
+  item = get_object_or_404(TodoItem, id=item_id)
+  if request.method == 'POST':
+    item.delete()
+  return redirect('logs:index')

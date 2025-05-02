@@ -25,8 +25,8 @@
         {% endfor %}
     </ul>
 
-    <!-- 新しいTodoItemを追加するフォームのリンク -->
-    <a href="{% url 'suggestions:list_form' %}">Back</a>
+    {% comment %} <!-- 新しいTodoItemを追加するフォームのリンク -->
+    <a href="{% url 'suggestions:list_form' %}">Back</a> {% endcomment %}
 
     <!-- タスクリストの作成ボタンなどを追加する場合 -->
     <form method="post">

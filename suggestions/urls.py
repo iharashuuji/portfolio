@@ -5,7 +5,7 @@ from suggestions import forms
 
 app_name = 'suggestions'
 urlpatterns = [
-  path('list_form/', views.list_form, name='list_form'),
+  # path('list_form/', views.list_form, name='list_form'),
   path('show/<int:list_id>', views.show, name='show'),
-
+  path('delete/<int:item_id>/', views.delete, name='delete'),
 ]

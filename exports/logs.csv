@@ -304,3 +304,4 @@ id,new_item_today,schedule_changed_today,emotion_state_today,routine_destination
 303,False,False,busy,False,True,True,True,
 304,True,False,busy,False,True,True,True,
 305,False,False,busy,False,True,True,True,
+306,False,False,busy,False,True,True,True,

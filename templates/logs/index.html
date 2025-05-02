@@ -12,7 +12,7 @@
       
         {% comment %} ２回目の入力に忘れ物をしたかを聞く機能 {% endcomment %}
         {% if last_log and last_log.will_forget == None %}
-          <a href="{% url 'logs:log_form_edit' last_log.id%}">TO LogForm</a>
+          <a href="{% url 'logs:log_form_edit' last_log.id%}">昨日はわすれものしました？</a>
         {% else %}
           <a href="{% url 'logs:log_form' %}">TO LogForm</a>
         {% endif %}
@@ -37,17 +37,14 @@
     <section class="note_forget_item">
       {% comment %} 忘れ物をする確率を５０％を超えた際に、持っていくべきものをTo Doまで自動で落とし込む {% endcomment %}
       {% if prediction and prediction > 0.5 %}
-      <form action="{% url 'suggestions:list_form' %}" method="post">
+      <form action="{% url 'suggestions:show' list_id=today_list.id%}" method="post">
         {% csrf_token %}
         <button type="submit">明日持つべきものをCHECK!</button>
       </form>
       {% endif %}
     </section>
-
     <section class="to_do_list">
       <h1>今日のやるべきこと</h1>
-
-
       {% comment %} {% if suggestions_today %}
       <ul>
         {% for suggestion in suggestions_today %}
@@ -62,14 +59,14 @@
       {% endif %} {% endcomment %}
 
       {% comment %}  {% endcomment %}
-
       {% if tasks %}
       <ul>
         {% for suggestion in tasks %}
-            <li>
-          {{ suggestion.task }}<br>
-
-            </li>
+          <form action="{% url "suggestions:delete" item_id=suggestion.id %}"  method="post">
+            {{ suggestion.task }}
+            {% csrf_token %}
+            <button type="submit">削除</button>
+          </form>
         {% endfor %}
         </ul>
       {% else %}
@@ -78,7 +75,7 @@
 
       {% comment %}  {% endcomment %}
 
-      {% if suggestions %}
+      {% comment %} {% if suggestions %}
       <ul>
         {% for suggestion in suggestions %}
             <li>
@@ -88,22 +85,24 @@
         </ul>
       {% else %}
         <p>昨日のやるべきことはありません。</p>
-      {% endif %} 
-      {% comment %} デバッグ用 {% endcomment %}
-      {% if suggestions %}
-      <ul>
-        {% for suggestion in suggestions %}
-            <li>{{ suggestion }}</li> <!-- suggestion の内容をそのまま表示 -->
-            <li>{{ suggestion.task }}</li> <!-- task が正しく表示されるか確認 -->
-        {% endfor %}
-      </ul>
-      {% else %}
-         <p>No suggestions found.</p>
-      {% endif %}
+      {% endif %}  {% endcomment %}
 
-      {% if suggestions_len > 0 %}
-        <p>デバッグ成功</p>
-      {%endif%}
+      {% if yesterday_list %}
+      <ul>
+        {% for suggestion in yesterday_item %}
+            <li>
+          {{ suggestion.task }}<br>
+            </li>
+        {% endfor %}
+        </ul>
+      {% else %}
+        <p>昨日のやるべきことはありません。</p>
+      {% endif %} 
+
+
+
+
+
     </section>
     </body>
 
