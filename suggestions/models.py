@@ -33,11 +33,11 @@ from datetime import date
 class TodoList(models.Model):
   # title = models.CharField(max_length=100)
   date = models.DateField(default=date.today, unique=True)
-  log = models.ForeignKey(
-        LogModel,
-        on_delete=models.CASCADE,
-        related_name="list_suggestions",
-        )
+  # log = models.ForeignKey(
+  #       LogModel,
+  #       on_delete=models.CASCADE,
+  #       related_name="list_suggestions",
+  #       )
   created_at = models.DateTimeField(auto_now_add=True)
   
   

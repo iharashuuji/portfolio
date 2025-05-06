@@ -26,4 +26,5 @@ urlpatterns = [
     path('', lambda request: redirect('accounts:sign_in') if not request.user.is_authenticated else redirect('logs:index')),
     path('', include('logs.urls', namespace='logs')),
     path('suggestions/', include('suggestions.urls', namespace='suggestions')),
+    path('proposals/', include('proposals.urls', namespace='proposals')),
 ]

@@ -17,6 +17,11 @@ from django.db.models import Q
 from django.utils.timezone import now
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
+import matplotlib.pyplot as plt
+import io
+import urllib, base64
+from proposals.models import List, Item
+
 
 
 
@@ -47,11 +52,11 @@ def index(request):
     yesterday = now().date() - timedelta(days=1)
     today = now().date()
     
-    today_list = TodoList.objects.filter(date=today).first()
+    today_list, created = TodoList.objects.get_or_create(date=today)
     yesterday_log = Log.objects.filter(date=yesterday).first()
 
 
-    suggestions = yesterday_log.list_suggestions.all() if yesterday_log else []
+    suggestions = TodoList.objects.filter(date=yesterday).first()
     # suggestions_today = today_list.items.all() if today_list else []
     logs = Log.objects.all()
     last_log = logs.last()
@@ -74,10 +79,18 @@ def index(request):
     task_text = None
 
 # TodoListの取得
-    list = TodoList.objects.filter(date=today).order_by('-date').first()
-    tasks = list.items.all()
+    list = TodoList.objects.filter(date=today).order_by('-date').first()    
+    if list is not None:
+        tasks = list.items.all()
+    else:
+        tasks = []
+
     yesterday_list = TodoList.objects.filter(date=yesterday).order_by('-date').first()
-    yesterday_item = yesterday_list.items.all()
+    if yesterday_list is not None:
+        yesterday_item = yesterday_list.items.all()
+    else:
+        yesterday_item = []
+
 
     if request.method == 'POST':
     # POSTデータからタスクテキストを取得
@@ -90,6 +103,27 @@ def index(request):
     ############
     
     
+    # 可視化
+    x = Log.objects.filter(will_forget=1).count()
+    y = Log.objects.filter(will_forget=0).count()
+    plt.bar(['Will Forget', 'Will Not Forget'], [x, y])
+    # バッファに保存
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    image_png = buf.getvalue()
+    buf.close()
+    # base64にエンコードしてテンプレートに渡す
+    graph = base64.b64encode(image_png).decode('utf-8')
+    ###
+    
+    mokuhyou = List.objects.filter(date=today).first()
+    if mokuhyou is not None: 
+       mokuhyou_items = mokuhyou.items.all()
+    else:
+        mokuhyou_items = []
+    
+    
     return render(request, 'logs/index.html',{
         'logs': logs,
         'prediction': prediction,
@@ -98,6 +132,8 @@ def index(request):
         'yesterday_item':yesterday_item,
         'today_list':today_list,
         'suggestions': suggestions,
+        'graph': graph,
+        'mokuhyou_items':mokuhyou_items,
     })
 
 # logは、回答を受信し、送信する関数

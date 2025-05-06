@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    {% load static %}
+    <link rel="stylesheet", href="{% static 'proposals/css/show.css' %}">
+    <script src="{% static 'proposals/css/show.js' %}"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>タスクリスト</title>
+</head>
+{% include "sidebar.html" %} 
+<form method="post">
+  {% csrf_token %}
+  <label for="new_task">新しいタスク:</label>
+  <input type="text" name="new_task" id="new_task" required>
+
+  <label for="new_proposal">提案:</label>
+  <input type="text" name="new_proposal" id="new_proposal" required>
+  <button type="submit">タスクを追加</button>
+</form>
+
+
+<table>
+  <thead>
+    <th>タスク</th>
+    <th>提案</th>
+  </thead>
+  <tbody>
+    {% for suggestion in tasks %}
+      <tr>
+        <td>{{ suggestion.task }}</td>
+        <td>{{ suggestion.proposal }}</td>
+        <td>
+          <form action="{% url "proposals:delete" item_id=suggestion.id %}"  method="post">
+            {% csrf_token %}
+            <button type="submit">削除</button>
+          </form>
+        </td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="2">まだタスクがありません。</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

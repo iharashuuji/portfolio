@@ -1,14 +1,20 @@
 <head>
   {% load static %}
-  <link rel="stylesheet", href="{% static 'logs/css/index.css' %}">
+  <link rel="stylesheet" href="{% static 'logs/css/index.css' %}">
   <script src="{% static 'logs/js/index.js' %}"></script>
 </head>
-<main>
-    <header>
-      {% include "sidebar.html" %}
-    </header>
-    <body>
-    <section class="confirm_will_forget">
+  <body>
+
+    <div id="d2">&nbsp;</div>
+    <script>
+      setInterval(function() {
+        document.getElementById("d2").innerHTML = new Date().toLocaleString();
+      }, 1000);
+    </script>
+
+
+    {% include "sidebar.html" %}
+      <section class="confirm_will_forget">
       
         {% comment %} ２回目の入力に忘れ物をしたかを聞く機能 {% endcomment %}
         {% if last_log and last_log.will_forget == None %}
@@ -22,7 +28,7 @@
         {% else %}
           <p>あなたの今日の確率を知ろう！</p>
         {% endif %}
-    </section>
+      </section>
     {% comment %} 予測結果の表示を行う {% endcomment %}
     <section class="show_prediction">
           <table class="table">
@@ -37,28 +43,16 @@
     <section class="note_forget_item">
       {% comment %} 忘れ物をする確率を５０％を超えた際に、持っていくべきものをTo Doまで自動で落とし込む {% endcomment %}
       {% if prediction and prediction > 0.5 %}
-      <form action="{% url 'suggestions:show' list_id=today_list.id%}" method="post">
-        {% csrf_token %}
-        <button type="submit">明日持つべきものをCHECK!</button>
-      </form>
+          <form action="{% url 'suggestions:show' list_id=today_list.id%}" method="post">
+          {% csrf_token %}
+          <button type="submit">明日持つべきものをCHECK!</button>
+          </form>
       {% endif %}
     </section>
     <section class="to_do_list">
       <h1>今日のやるべきこと</h1>
-      {% comment %} {% if suggestions_today %}
-      <ul>
-        {% for suggestion in suggestions_today %}
-            <li>
-          {{ suggestion.task }}<br>
 
-            </li>
-        {% endfor %}
-        </ul>
-      {% else %}
-        <p>今日のやるべきことはありません。</p>
-      {% endif %} {% endcomment %}
 
-      {% comment %}  {% endcomment %}
       {% if tasks %}
       <ul>
         {% for suggestion in tasks %}
@@ -69,38 +63,28 @@
           </form>
         {% endfor %}
         </ul>
+      {% endif %}
+
+
+      {% comment %} tobeから決めたTodoを表示する箇所 {% endcomment %}
+
+      
+      {% if mokuhyou_items %}
+      <ul>
+        {% for suggestion in mokuhyou_items %}
+            <li>{{ suggestion.task }}</li>
+            {% csrf_token %}
+          </form>
+        {% endfor %}
+        </ul>
       {% else %}
         <p>今日のやるべきことはありません。</p>
       {% endif %}
 
-      {% comment %}  {% endcomment %}
+      
 
-      {% comment %} {% if suggestions %}
-      <ul>
-        {% for suggestion in suggestions %}
-            <li>
-          {{ suggestion.task }}<br>
-            </li>
-        {% endfor %}
-        </ul>
-      {% else %}
-        <p>昨日のやるべきことはありません。</p>
-      {% endif %}  {% endcomment %}
-
-      {% comment %} {% if yesterday_list %}
-      <ul>
-        {% for suggestion in yesterday_item %}
-            <li>
-          {{ suggestion.task }}<br>
-            </li>
-        {% endfor %}
-        </ul>
-      {% else %}
-        <p>昨日のやるべきことはありません。</p>
-      {% endif %}  {% endcomment %}
-
-<!--問題点：昨日のやるべき事がある想定なのに表示がされていない状況）のデバッグ用-->
-     <h1>昨日に入力されたやるべき事</h1>
+      <!--問題点：昨日のやるべき事がある想定なのに表示がされていない状況）のデバッグ用-->
+      <h1>昨日に入力されたやるべき事</h1>
       {% if yesterday_item %}
       <ul>
       {% for suggestion in yesterday_item %}
@@ -114,17 +98,9 @@
       {% else %}
         <p>昨日のやるべきことはありません。</p>
       {% endif %}
-
-
-
-
     </section>
-    </body>
+  </body>
 
-    <footer>
-    </footer>
-
-</main>
 
 
 
@@ -135,3 +111,5 @@
       <input type="text" name="new_task" id="new_task" required>
       <button type="submit">タスクを追加</button>
   </form>
+
+<img src="data:image/png;base64,{{ graph }}" alt="グラフ">
