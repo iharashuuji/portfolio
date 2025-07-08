@@ -1,0 +1,9 @@
+Django==5.0.3
+scikit-learn==1.4.2
+numpy==1.26.4
+crispy-bootstrap5==2024.2
+pandas
+datetime
+matplotlib
+joblib
+numpy
