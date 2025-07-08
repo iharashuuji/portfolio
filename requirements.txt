@@ -4,3 +4,6 @@ numpy==1.26.4
 crispy-bootstrap5==2024.2
 pandas
 datetime
+matplotlib
+joblib
+numpy
